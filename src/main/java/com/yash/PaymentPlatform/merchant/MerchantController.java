@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.yash.paymentplatform.merchant.dto.MerchantRequest;
 import com.yash.paymentplatform.merchant.dto.MerchantResponse;
 
+import jakarta.validation.Valid;
+
 
 
 @RestController
@@ -20,7 +22,7 @@ public class MerchantController {
     }
     
     @PostMapping("/api/v1/merchants")
-    public MerchantResponse CreateMerchant(@RequestBody MerchantRequest request) {
+    public MerchantResponse CreateMerchant(@Valid@RequestBody MerchantRequest request) {
         Merchant merchant=merchantService.CreateMerchant(request);
 
         return new MerchantResponse(merchant.getId(),merchant.getName());
