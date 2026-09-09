@@ -9,13 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 
+
 @Entity
 public class Provider {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -36,9 +37,9 @@ public class Provider {
 
     public ProviderStatus getStatus() {
         return status;
-}
+    }
 
     public void setStatus(ProviderStatus status) {
-        this.status = status;
+    this.status = status;
 }
 }
