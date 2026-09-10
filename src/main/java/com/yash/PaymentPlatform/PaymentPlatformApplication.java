@@ -1,4 +1,4 @@
-package com.yash.PaymentPlatform;
+package com.yash.paymentplatform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
