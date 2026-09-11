@@ -1,7 +1,6 @@
 package com.yash.paymentplatform.payment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,12 +49,14 @@ class PaymentOrchestratorTest {
 
         PaymentAttempt attempt =
                 paymentOrchestrator.processPayment(payment.getId());
-
-        assertNotNull(attempt);
-        assertNotNull(attempt.getId());
+        Payment updatedPayment=paymentRepository.findById(payment.getId())
+            .orElseThrow(() ->
+                    new RuntimeException("Payment not found with id: "));
+        
+        
         assertEquals(payment.getId(), attempt.getPayment().getId());
         assertEquals(ProviderStatus.ACTIVE, attempt.getProvider().getStatus());
-       // assertEquals(provider.getId(), attempt.getProvider().getId());
-        assertEquals(PaymentAttemptStatus.INITIATED, attempt.getStatus());
+        assertEquals(PaymentAttemptStatus.SUCCEEDED, attempt.getStatus());
+        assertEquals(PaymentStatus.SUCCEEDED, updatedPayment.getStatus());
     }
 }

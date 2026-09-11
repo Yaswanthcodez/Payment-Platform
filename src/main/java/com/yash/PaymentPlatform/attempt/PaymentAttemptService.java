@@ -34,5 +34,10 @@ public class PaymentAttemptService{
         return paymentAttemptRepository.save(attempt);   
     }
 
+    public PaymentAttempt updateStatus(PaymentAttempt paymentAttempt,PaymentAttemptStatus paymentAttemptStatus){
+        paymentAttempt.setStatus(paymentAttemptStatus);       
+        return paymentAttemptRepository.save(paymentAttempt);   
+    }
+
 
 }
