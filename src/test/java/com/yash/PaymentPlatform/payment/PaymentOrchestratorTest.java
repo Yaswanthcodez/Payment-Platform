@@ -1,5 +1,5 @@
 package com.yash.paymentplatform.payment;
-
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,10 @@ import com.yash.paymentplatform.attempt.PaymentAttemptStatus;
 import com.yash.paymentplatform.merchant.Merchant;
 import com.yash.paymentplatform.merchant.MerchantRepository;
 import com.yash.paymentplatform.provider.Provider;
+import com.yash.paymentplatform.provider.ProviderExecutionOutcome;
 import com.yash.paymentplatform.provider.ProviderRepository;
 import com.yash.paymentplatform.provider.ProviderStatus;
+import com.yash.paymentplatform.provider.SimulatedProviderExecutor;
 
 @SpringBootTest
 class PaymentOrchestratorTest {
@@ -27,6 +29,14 @@ class PaymentOrchestratorTest {
 
     @Autowired
     private ProviderRepository providerRepository;
+
+    @Autowired
+    private SimulatedProviderExecutor simulatedProviderExecutor;
+
+    @AfterEach
+    void resetoutcome(){
+        simulatedProviderExecutor.setOutcome(ProviderExecutionOutcome.SUCCESS);
+    }
 
     @Test
     void shouldCreatePaymentAttemptUsingActiveProvider() {
@@ -58,5 +68,38 @@ class PaymentOrchestratorTest {
         assertEquals(ProviderStatus.ACTIVE, attempt.getProvider().getStatus());
         assertEquals(PaymentAttemptStatus.SUCCEEDED, attempt.getStatus());
         assertEquals(PaymentStatus.SUCCEEDED, updatedPayment.getStatus());
+    }
+
+    @Test
+    void shouldMarkPaymentAndAttemptAsFailedWhenProviderFails() {
+        Merchant merchant = new Merchant();
+        merchant.setName("Test Merchant");
+        merchant = merchantRepository.save(merchant);
+
+        Payment payment = new Payment();
+        payment.setMerchant(merchant);
+        payment.setAmount(10000L);
+        payment.setCurrency("INR");
+        payment.setStatus(PaymentStatus.CREATED);
+        payment = paymentRepository.save(payment);
+
+        Provider provider = new Provider();
+        provider.setName("Test Provider");
+        provider.setStatus(ProviderStatus.ACTIVE);
+        provider = providerRepository.save(provider);
+
+        simulatedProviderExecutor.setOutcome(ProviderExecutionOutcome.FAILURE);
+
+        PaymentAttempt attempt =
+                paymentOrchestrator.processPayment(payment.getId());
+        Payment updatedPayment=paymentRepository.findById(payment.getId())
+            .orElseThrow(() ->
+                    new RuntimeException("Payment not found with id: "));
+        
+        
+        assertEquals(payment.getId(), attempt.getPayment().getId());
+        assertEquals(ProviderStatus.ACTIVE, attempt.getProvider().getStatus());
+        assertEquals(PaymentAttemptStatus.FAILED, attempt.getStatus());
+        assertEquals(PaymentStatus.FAILED, updatedPayment.getStatus());
     }
 }

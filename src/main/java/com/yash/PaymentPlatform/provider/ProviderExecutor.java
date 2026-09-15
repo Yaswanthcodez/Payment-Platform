@@ -4,5 +4,5 @@ import com.yash.paymentplatform.payment.Payment;
 
 public interface ProviderExecutor {
 
-    boolean execute(Payment payment, Provider provider);
+    ProviderExecutionOutcome execute(Payment payment, Provider provider);
 }

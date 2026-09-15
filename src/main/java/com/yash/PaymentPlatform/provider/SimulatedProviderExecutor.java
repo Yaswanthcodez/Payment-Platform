@@ -6,9 +6,15 @@ import com.yash.paymentplatform.payment.Payment;
 
 @Component
 public class SimulatedProviderExecutor implements ProviderExecutor {
+    private ProviderExecutionOutcome outcome = ProviderExecutionOutcome.SUCCESS;
+
+    public void setOutcome(ProviderExecutionOutcome outcome){
+        this.outcome = outcome;
+    }
+
 
     @Override
-    public boolean execute(Payment payment, Provider provider) {
-        return true;
+    public ProviderExecutionOutcome execute(Payment payment, Provider provider) {
+        return outcome;
     }
 }

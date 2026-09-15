@@ -7,6 +7,8 @@ import com.yash.paymentplatform.attempt.PaymentAttemptService;
 import com.yash.paymentplatform.provider.Provider;
 import com.yash.paymentplatform.provider.ProviderRouter;
 import com.yash.paymentplatform.provider.ProviderExecutor;
+import com.yash.paymentplatform.provider.ProviderExecutionOutcome;
+
 import com.yash.paymentplatform.attempt.PaymentAttemptStatus;
 
 
@@ -38,8 +40,8 @@ public class PaymentOrchestrator {
         Provider provider = providerRouter.selectProvider();
         PaymentAttempt attempt = paymentAttemptService.createPaymentAttempt(paymentId, provider);
         paymentAttemptService.updateStatus(attempt,PaymentAttemptStatus.PROCESSING);
-        boolean succesful=providerExecutor.execute(payment,provider);
-        if (succesful){
+        ProviderExecutionOutcome successful=providerExecutor.execute(payment,provider);
+        if (successful==ProviderExecutionOutcome.SUCCESS){
             paymentAttemptService.updateStatus(attempt,PaymentAttemptStatus.SUCCEEDED);
             payment.setStatus(PaymentStatus.SUCCEEDED);
         }
