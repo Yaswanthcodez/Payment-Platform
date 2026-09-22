@@ -1,12 +1,27 @@
 package com.yash.paymentplatform.payment;
 
-import com.yash.paymentplatform.merchant.Merchant;
-import jakarta.persistence.*;
-
 import java.time.Instant;
 
+import com.yash.paymentplatform.merchant.Merchant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
 @Entity
-@Table(name = "payments")
+@Table(name = "payments",
+        uniqueConstraints=@UniqueConstraint( columnNames={"merchant_id","idempotency_key"}))
+
 public class Payment {
 
     @Id
@@ -29,6 +44,9 @@ public class Payment {
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Column(nullable=false)
+    private String idempotencyKey;
 
     public Long getId() {
         return id;
@@ -73,5 +91,13 @@ public class Payment {
     @PrePersist
     protected void onCreate() {
         createdAt = Instant.now();
+    }
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+
+    public void setIdempotencyKey(String key) {
+        this.idempotencyKey =key;
     }
 }

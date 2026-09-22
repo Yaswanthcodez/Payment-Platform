@@ -1,9 +1,15 @@
 package com.yash.paymentplatform.payment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.yash.paymentplatform.payment.dto.PaymentRequest;
 import com.yash.paymentplatform.payment.dto.PaymentResponse;
+
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PaymentController {
@@ -16,9 +22,10 @@ public class PaymentController {
 
     @PostMapping("/api/v1/payments")
     public PaymentResponse createPayment(
-            @Valid @RequestBody PaymentRequest request) {
+            @Valid @RequestBody PaymentRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
 
-        Payment payment = paymentService.createPayment(request);
+        Payment payment = paymentService.createPayment(request,idempotencyKey);
 
         return new PaymentResponse(
                 payment.getId(),
